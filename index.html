@@ -48,7 +48,7 @@
   
   <body>
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.0001; filterBeta: 0.1;" 
+      mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.0001; filterBeta: 0.01;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
@@ -109,12 +109,12 @@
         if (isVisible) {
           // 表示中なら → 消す
           targetLayer.setAttribute('visible', false);
-          toggleBtn.innerText = "👁️ Show Front";
+          toggleBtn.innerText = "😃 Show Logo";
           toggleBtn.style.backgroundColor = "#555"; // グレーにする
         } else {
           // 消えてるなら → 表示する
           targetLayer.setAttribute('visible', true);
-          toggleBtn.innerText = "👁️ Hide Front";
+          toggleBtn.innerText = "😌 Hide Logo";
           toggleBtn.style.backgroundColor = "#2196F3"; // 青に戻す
         }
       });

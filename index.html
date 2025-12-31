@@ -2,19 +2,18 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebAR Complete Demo</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      #play-button {
-        position: fixed;       /* 画面に固定 */
-        bottom: 20px;          /* 下から20px */
-        left: 50%;             /* 左右中央 */
-        transform: translateX(-50%); 
-        z-index: 1000;         /* 最前面に表示 */
-        
+      /* 共通のボタンデザイン */
+      .ar-button {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000; /* AR画面より手前に表示 */
         padding: 10px 20px;
-        background-color: #ff4081; /* ピンク色 */
         color: white;
         border: none;
         border-radius: 30px;
@@ -22,17 +21,34 @@
         font-weight: bold;
         cursor: pointer;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        width: 180px; /* ボタンの幅を揃える */
       }
-      
-      #play-button:active {
+
+      /* ボタンを押した時の動き */
+      .ar-button:active {
         transform: translateX(-50%) translateY(2px);
+        box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+      }
+
+      /* 個別の色と位置設定 */
+      
+      /* 表示切替ボタン（上） */
+      #toggle-button {
+        bottom: 80px;
+        background-color: #2196F3; /* 青 */
+      }
+
+      /* 音声再生ボタン（下） */
+      #play-button {
+        bottom: 20px;
+        background-color: #ff4081; /* ピンク */
       }
     </style>
   </head>
   
   <body>
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.0001; filterBeta: 0.1;" 
+      mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.0001; filterBeta: 0.001;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
@@ -52,27 +68,54 @@
 
         <a-image src="#img-middle" position="0 0 0.7" height="2" width="2"></a-image>
 
-        <a-image src="#img-front" position="0 0 1.5" height="2" width="2"></a-image>
+        <a-image id="target-layer" src="#img-front" position="0 0 1.5" height="2" width="2"></a-image>
 
       </a-entity>
     </a-scene>
 
-    <button id="play-button">🎵 Voice Play</button>
+    <button id="toggle-button" class="ar-button">👁️ Hide Front</button>
+    
+    <button id="play-button" class="ar-button">🎵 Voice Play</button>
     
     <audio id="bgm" src="./voice.mp3"></audio>
 
+
     <script>
-      const button = document.getElementById('play-button');
+      // --- 音声再生ボタンの機能 ---
+      const playBtn = document.getElementById('play-button');
       const audio = document.getElementById('bgm');
 
-      button.addEventListener('click', function() {
+      playBtn.addEventListener('click', function() {
         if (audio.paused) {
           audio.play();
-          button.innerText = "🔇 Stop";
+          playBtn.innerText = "🔇 Stop";
+          playBtn.style.backgroundColor = "#555"; // 停止中は色をグレーにする演出
         } else {
           audio.pause();
-          audio.currentTime = 0;
-          button.innerText = "🎵 Voice Play";
+          audio.currentTime = 0; // 最初に戻す
+          playBtn.innerText = "🎵 Voice Play";
+          playBtn.style.backgroundColor = "#ff4081"; // 色を戻す
+        }
+      });
+
+      // --- 表示切替ボタンの機能 ---
+      const toggleBtn = document.getElementById('toggle-button');
+      const targetLayer = document.getElementById('target-layer');
+
+      toggleBtn.addEventListener('click', function() {
+        // 現在の表示状態を確認 (MindAR/A-Frameでは文字列として取得されます)
+        const isVisible = targetLayer.getAttribute('visible') !== false;
+
+        if (isVisible) {
+          // 表示中なら → 消す
+          targetLayer.setAttribute('visible', false);
+          toggleBtn.innerText = "👁️ Show Front";
+          toggleBtn.style.backgroundColor = "#555"; // グレーにする
+        } else {
+          // 消えてるなら → 表示する
+          targetLayer.setAttribute('visible', true);
+          toggleBtn.innerText = "👁️ Hide Front";
+          toggleBtn.style.backgroundColor = "#2196F3"; // 青に戻す
         }
       });
     </script>

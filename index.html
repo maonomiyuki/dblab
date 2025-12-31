@@ -4,32 +4,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+      #play-button {
+        position: fixed;       /* 画面に固定 */
+        bottom: 20px;          /* 下から20px */
+        left: 50%;             /* 左右中央 */
+        transform: translateX(-50%); 
+        z-index: 1000;         /* 最前面に表示 */
+        
+        padding: 10px 20px;
+        background-color: #ff4081; /* ピンク色 */
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      }
+      
+      #play-button:active {
+        transform: translateX(-50%) translateY(2px);
+      }
+    </style>
   </head>
+  
   <body>
-<a-scene 
-  mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.0001; filterBeta: 0.01;" 
-  color-space="sRGB" 
-  renderer="colorManagement: true, physicallyCorrectLights" 
-  vr-mode-ui="enabled: false" 
-  device-orientation-permission-ui="enabled: false">
+    <a-scene 
+      mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.0001; filterBeta: 0.001;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
 
       <a-assets>
-        <img id="my-illust" src="./illust.png" />
+        <img id="img-back" src="./layer_back.png" />
+        <img id="img-middle" src="./layer_middle.png" />
+        <img id="img-front" src="./layer_front.png" />
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
         
-        <a-image 
-            src="#my-illust" 
-            position="0 0 0" 
-            height="1" 
-            width="1" 
-            rotation="0 0 0" 
-        ></a-image>
+        <a-image src="#img-back" position="0 0 0" height="1" width="1"></a-image>
+
+        <a-image src="#img-middle" position="0 0 0.3" height="1" width="1"></a-image>
+
+        <a-image src="#img-front" position="0 0 0.6" height="1" width="1"></a-image>
 
       </a-entity>
     </a-scene>
+
+    <button id="play-button">🎵 Voice Play</button>
+    
+    <audio id="bgm" src="./voice.mp3"></audio>
+
+    <script>
+      const button = document.getElementById('play-button');
+      const audio = document.getElementById('bgm');
+
+      button.addEventListener('click', function() {
+        if (audio.paused) {
+          audio.play();
+          button.innerText = "🔇 Stop";
+        } else {
+          audio.pause();
+          audio.currentTime = 0;
+          button.innerText = "🎵 Voice Play";
+        }
+      });
+    </script>
   </body>
 </html>

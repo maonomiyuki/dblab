@@ -7,41 +7,50 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      /* 共通のボタンデザイン */
-      .ar-button {
+      /* ★変更：ボタンをまとめる「透明な箱」のデザイン */
+      #ui-container {
         position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000; /* AR画面より手前に表示 */
-        padding: 10px 20px;
+        bottom: 30px;        /* 下からの位置 */
+        left: 0;
+        width: 100%;         /* 横幅いっぱい */
+        display: flex;       /* 中身を横並びにする魔法の呪文 */
+        justify-content: center; /* 中央寄せ（左右に離したい場合は space-between にする） */
+        gap: 20px;           /* ボタン同士の間隔 */
+        z-index: 1000;       /* 最前面 */
+        pointer-events: none; /* ボタン以外の場所はタッチをARに通す設定 */
+      }
+
+      /* ★変更：ボタン共通デザイン（位置指定を削除） */
+      .ar-button {
+        /* position: fixed; ← 削除（箱の方で位置を決めるため） */
+        /* left: ...        ← 削除 */
+        /* bottom: ...      ← 削除 */
+        /* transform: ...   ← 削除 */
+        
+        pointer-events: auto; /* ボタン自体は押せるようにする */
+        
+        padding: 10px 0;      /* 横幅固定にするので左右パディングは0でもOK */
+        width: 140px;         /* 2つ並ぶので少し幅を調整 */
         color: white;
         border: none;
         border-radius: 30px;
-        font-size: 16px;
+        font-size: 14px;      /* 文字がはみ出ないよう少し小さく */
         font-weight: bold;
         cursor: pointer;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        width: 180px; /* ボタンの幅を揃える */
       }
 
-      /* ボタンを押した時の動き */
       .ar-button:active {
-        transform: translateX(-50%) translateY(2px);
+        transform: translateY(2px);
         box-shadow: 0 2px 3px rgba(0,0,0,0.3);
       }
 
-      /* 個別の色と位置設定 */
-      
-      /* 表示切替ボタン（上） */
+      /* 色の設定 */
       #toggle-button {
-        bottom: 80px;
-        background-color: #2196F3; /* 青 */
+        background-color: #2196F3;
       }
-
-      /* 音声再生ボタン（下） */
       #play-button {
-        bottom: 20px;
-        background-color: #ff4081; /* ピンク */
+        background-color: #ff4081;
       }
     </style>
   </head>
@@ -63,25 +72,21 @@
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        
         <a-image src="#img-back" position="0 0 0" height="2" width="2"></a-image>
-
         <a-image src="#img-middle" position="0 0 0.7" height="2" width="2"></a-image>
-
         <a-image id="target-layer" src="#img-front" position="0 0 1.5" height="2" width="2"></a-image>
-
       </a-entity>
     </a-scene>
 
-    <button id="toggle-button" class="ar-button">Hide Logo</button>
-    
-    <button id="play-button" class="ar-button">🎵 Voice Play</button>
+    <div id="ui-container">
+      <button id="toggle-button" class="ar-button">Hide Logo</button>
+      <button id="play-button" class="ar-button">🎵 Voice Play</button>
+    </div>
     
     <audio id="bgm" src="./voice.mp3"></audio>
 
-
     <script>
-      // --- 音声再生ボタンの機能 ---
+      // 機能はそのままです
       const playBtn = document.getElementById('play-button');
       const audio = document.getElementById('bgm');
 
@@ -89,33 +94,29 @@
         if (audio.paused) {
           audio.play();
           playBtn.innerText = "🔇 Stop";
-          playBtn.style.backgroundColor = "#555"; // 停止中は色をグレーにする演出
+          playBtn.style.backgroundColor = "#555";
         } else {
           audio.pause();
-          audio.currentTime = 0; // 最初に戻す
+          audio.currentTime = 0;
           playBtn.innerText = "🎵 Voice Play";
-          playBtn.style.backgroundColor = "#ff4081"; // 色を戻す
+          playBtn.style.backgroundColor = "#ff4081";
         }
       });
 
-      // --- 表示切替ボタンの機能 ---
       const toggleBtn = document.getElementById('toggle-button');
       const targetLayer = document.getElementById('target-layer');
 
       toggleBtn.addEventListener('click', function() {
-        // 現在の表示状態を確認 (MindAR/A-Frameでは文字列として取得されます)
         const isVisible = targetLayer.getAttribute('visible') !== false;
 
         if (isVisible) {
-          // 表示中なら → 消す
           targetLayer.setAttribute('visible', false);
           toggleBtn.innerText = "Show Logo";
-          toggleBtn.style.backgroundColor = "#555"; // グレーにする
+          toggleBtn.style.backgroundColor = "#555";
         } else {
-          // 消えてるなら → 表示する
           targetLayer.setAttribute('visible', true);
           toggleBtn.innerText = "Hide Logo";
-          toggleBtn.style.backgroundColor = "#2196F3"; // 青に戻す
+          toggleBtn.style.backgroundColor = "#2196F3";
         }
       });
     </script>
